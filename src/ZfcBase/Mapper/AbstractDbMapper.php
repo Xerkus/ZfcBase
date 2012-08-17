@@ -18,7 +18,7 @@ abstract class AbstractDbMapper extends EventProvider
      * @var Adapter
      */
     protected $dbAdapter;
-    
+
     /**
      * @var Adapter
      */
@@ -114,6 +114,25 @@ abstract class AbstractDbMapper extends EventProvider
     }
 
     /**
+     * @param  string|array|closure $where
+     * @param string $tableName
+     * @return mixed
+     */
+    public function delete($where, $tableName = null)
+    {
+        $tableName = $tableName ?: $this->tableName;
+
+        $sql = new Sql($this->getDbAdapter(), $tableName);
+
+        $delete = $sql->delete();
+        $delete->where($where);
+        $statement = $sql->prepareStatementForSqlObject($delete);
+        $result = $statement->execute();
+
+        return $result->getAffectedRows();
+    }
+
+    /**
      * @return object
      */
     public function getEntityPrototype()
@@ -152,7 +171,7 @@ abstract class AbstractDbMapper extends EventProvider
         }
         return $this;
     }
-    
+
     /**
      * @return Adapter
      */
@@ -160,7 +179,7 @@ abstract class AbstractDbMapper extends EventProvider
     {
         return $this->dbSlaveAdapter ?: $this->dbAdapter;
     }
-    
+
     /**
      * @param Adapter $dbAdapter
      * @return AbstractDbMapper
